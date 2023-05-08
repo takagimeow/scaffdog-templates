@@ -36,7 +36,9 @@ ignore: []
         // TailwindCSS
         "bradlc.vscode-tailwindcss",
         // Snippet
-        "vscode-snippet.snippet"
+        "vscode-snippet.snippet",
+        // scaffdog
+        "scaffdog.scaffdog-vscode"
       ]
     }
   }
