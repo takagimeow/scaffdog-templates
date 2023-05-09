@@ -5,6 +5,29 @@ output: '**/*'
 ignore: []
 ---
 
+# `src/hooks/example.test.ts`
+
+```tsx
+import React from "react";
+import { renderHook, act } from "@testing-library/react-hooks"
+
+const useCount = () => {
+  const [count, setCount] = React.useState(0)
+  return {
+    count,
+    setCount
+  }
+}
+it("smoke test", () => {
+  const { result } = renderHook(() => useCount())
+  act(() => {
+    result.current.setCount(1)
+  })
+  expect(result.current.count).toBe(1)
+})
+
+```
+
 # `src/app.tsx`
 
 ```tsx
@@ -84,6 +107,15 @@ setup().then(() => {
 
 ```
 
+# `test/setup-test-env.ts`
+
+```tsx
+import "@testing-library/jest-dom/extend-expect";
+import type React from "react";
+import { vi } from "vitest";
+
+```
+
 # `.gitignore`
 
 ```
@@ -122,7 +154,8 @@ dist-ssr
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "test": "vitest"
   },
   "dependencies": {
     "react": "18.2.0",
@@ -131,13 +164,22 @@ dist-ssr
   },
   "devDependencies": {
     "@rollup/plugin-replace": "5.0.2",
+    "@testing-library/dom": "^9.2.0",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/react-hooks": "^8.0.1",
+    "@testing-library/user-event": "^14.4.3",
     "@types/node": "18.11.18",
     "@types/react": "18.0.27",
     "@types/react-dom": "18.0.10",
     "@vitejs/plugin-react": "3.0.1",
+    "@vitest/coverage-c8": "^0.31.0",
+    "happy-dom": "^9.10.9",
     "msw": "^1.2.1",
     "typescript": "4.9.5",
-    "vite": "4.0.4"
+    "vite": "4.0.4",
+    "vite-tsconfig-paths": "^4.2.0",
+    "vitest": "^0.31.0"
   },
   "msw": {
     "workerDirectory": "public"
@@ -173,6 +215,7 @@ This example demonstrates a simple usage of a Data Router, using `createBrowserR
     "baseUrl": ".",
     "target": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "types": ["vitest/globals"],
     "allowJs": false,
     "skipLibCheck": true,
     "esModuleInterop": false,
@@ -235,6 +278,32 @@ export default defineConfig({
     : {},
 });
 
+```
+
+# `vitest.config.ts`
+
+```ts
+/// <reference types="vitest" />
+/// <reference types="vite/client" />
+
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
+import tsconfigPaths from "vite-tsconfig-paths";
+
+export default defineConfig({
+  plugins: [react(), tsconfigPaths()],
+  test: {
+    globals: true,
+    environment: "happy-dom",
+    setupFiles: ["./test/setup-test-env.ts"],
+    include: ["./src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+    watchExclude: [
+      ".*\\/node_modules\\/.*",
+      ".*\\/build\\/.*",
+      ".*\\/postgres-data\\/.*",
+    ],
+  },
+});
 ```
 
 <!-- MSW -->
